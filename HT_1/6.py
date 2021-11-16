@@ -4,7 +4,8 @@
 #        -1 -> (1, 5, 8, 3) : False
 
 
+# container = tuple(map(str, input("Container values: ").split(" ")))
 container = list(map(str, input("Container values: ").split(" ")))
 SearchedValue = input("Enter searched value: ")
 
-print(f"{SearchedValue} -> {container} : {SearchedValue in container}")
+print(f"{SearchedValue} -> {container}: {SearchedValue in container}")
