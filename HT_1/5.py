@@ -2,8 +2,7 @@
 #        Sample decimal number: 30, 4
 #        Expected output: 1e, 04
 
-print("Enter your decimal digits, separated by comma:")
-digits = list(map(int, input().split(",")))
+digits = list(map(int, input("Enter your decimal digits, separated by comma: ").split(",")))
 HexDigits = []
 
 for i in range(len(digits)):
