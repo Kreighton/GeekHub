@@ -10,15 +10,16 @@ while TypeOfInput != "1" or TypeOfInput != "2":
     if TypeOfInput.isdigit():
         if int(TypeOfInput) <= 0 or int(TypeOfInput) > 2:
             print("Enter correct value!")
-        else: 
+        else:
             break
-    else: 
+    else:
         print("Enter correct value!")
 
+
 if TypeOfInput == "1":
-    container = list(input("You choose 1. Enter list values: ").split(" "))
+    container = list(input("You choose 1. Enter list values: ").split(" ", ", "))
 elif TypeOfInput == "2":
-    container = tuple(input("You choose 2. Enter tuple values: ").split(" "))
+    container = tuple(input("You choose 2. Enter tuple values: ").split(" ", ", "))
 
 SearchedValue = input("Enter searched value: ")
 
