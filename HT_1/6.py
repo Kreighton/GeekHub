@@ -17,9 +17,9 @@ while TypeOfInput != "1" or TypeOfInput != "2":
 
 
 if TypeOfInput == "1":
-    container = list(input("You choose 1. Enter list values: ").split(" "))
+    container = list(input("You choose 1. Enter list values, separated with spaces: ").split(" "))
 elif TypeOfInput == "2":
-    container = tuple(input("You choose 2. Enter tuple values: ").split(" "))
+    container = tuple(input("You choose 2. Enter tuple values, separated with spaces: ").split(" "))
 
 SearchedValue = input("Enter searched value: ")
 
