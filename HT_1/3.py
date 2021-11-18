@@ -1,9 +1,15 @@
-# 3. Write a script to sum of the first n positive integers.
-
-NumOfSums = input("Enter number for summing: ")
+NumOfSums = 0
 SumOfNums = 0
 
-for i in range(int(NumOfSums)):
-    SumOfNums += (i+1)
+while True:
+    try:
+        NumOfSums = int(input("Enter number for summing: "))
+        break
+    except ValueError:
+        print("This was not the number!")
+
+
+for i in range(NumOfSums):
+    SumOfNums += i+1
 
 print(SumOfNums)
