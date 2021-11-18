@@ -8,10 +8,10 @@ TypeOfInput = ""
 while TypeOfInput != "1" or TypeOfInput != "2":
     TypeOfInput = input("List or Tuple? (1 - List, 2 - Tuple): ")
     if TypeOfInput.isdigit():
-        if int(TypeOfInput) <= 0 or int(TypeOfInput) > 2:
-            print("Enter correct value!")
-        else:
+        if int(TypeOfInput) == 1 or int(TypeOfInput) == 2:
             break
+        else:
+            print("Enter correct value!")
     else:
         print("Enter correct value!")
 
