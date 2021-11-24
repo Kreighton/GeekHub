@@ -20,8 +20,8 @@ while True:
     sec_num = input("Enter second number: ")
     sign_mark = input("Enter operation (+, -, *, /): ")
     result, error_value = calculator_custom(first_num, sec_num, sign_mark)
+    
+    print(result)
+    
     if error_value == 0:
-        print(result)
         break
-    else:
-        print(result)
