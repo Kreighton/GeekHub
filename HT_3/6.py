@@ -4,58 +4,36 @@
 # -  якщо довжина менше 30 -> прiнтує суму всiх чисел та окремо рядок без цифр (лише з буквами)
 # -  якщо довжина бульше 50 - > ваша фантазiя
 
-from string import ascii_letters
 
-
-def smallstring(input_string):
-    only_letters = ''
-    only_nums_sum = 0
-    for i in input_string:
-        if i in ascii_letters:
-            only_letters += i
-        elif i.isdigit():
-            only_nums_sum += int(i)
-    return f"Sum of numbers from string = {only_nums_sum}\nString with only letters = {only_letters}"
-
-
-def mediumstring(input_string):
-    number_of_digits = 0
-    number_of_letters = 0
-    for i in input_string:
-        if i.isdigit():
-            number_of_digits += 1
-        else:
-            number_of_letters += 1
-    return f"String length = {len(input_string)}\nDigits in string = {number_of_digits}\nLetters in string = {number_of_letters}"
-
-
-def largestring_custom(input_string):
-    input_list = [i for i in input_string]
-    input_list.sort()
-    result_string = ''
+def count_your_string(test_case):
+    test_list = [i for i in test_case]
+    test_digits = []
+    test_not_digits = []
+    more_than_fifty = ""
     count = 0
-    for i in range(len(input_list)):
-        try:
-            if input_list[i] == input_list[i + 1]:
-                count += 1
-            else:
-                result_string += f'Number of \'{input_list[i]}\' symbol in list = {count}\n'
-                count = 0
-        except:
-            return result_string
+    for i in test_case:
+        if i.isdigit():
+            test_digits.append(int(i))
+        elif i.isalpha():
+            test_not_digits.append(i)
 
-
-def length_cases(input_string):
-    string_len = len(input_string)
-
-    if string_len > 50:
-        return largestring_custom(input_string)
-    elif string_len < 30:
-        return smallstring(input_string)
+    if len(test_list) > 50:
+        return "wat"
+    elif len(test_list) < 30:
+        return f"Sum = {sum(test_digits)}\nAll letters = {test_not_digits}"
     else:
-        return mediumstring(input_string)
+        test_list.sort()
+        for i in range(len(test_list)):
+            try:
+                if test_list[i] == test_list[i + 1]:
+                    count += 1
+                else:
+                    more_than_fifty += f'Number of \'{test_list[i]}\' symbol in list = {count}\n'
+                    count = 0
+            except IndexError:
+                return more_than_fifty
 
 
-test_input = input("Enter the string:")
+test_input = input("Enter random string: ")
 
-print(length_cases(test_input))
+print(count_your_string(test_input))
