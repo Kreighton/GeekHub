@@ -12,7 +12,7 @@ class LoginException(Exception):
 
 
 def login_check(login, pword, silent=False):
-    login_logs = [['Pasha', '123'], ['', ''], ['', ''], ['', ''], ['', '']]
+    login_logs = [['Pasha', '123'], ['Eugene', '1yuh2g3jgkh12'], ['Kyle', 'qwerty'], ['foo', 'bar'], ['Mat', 'rix']]
     try:
         if [login, pword] in login_logs:
             return True
