@@ -12,7 +12,6 @@
 #   1
 #   .......
 
-
 def generator(val):
     item = 0
     while True:
@@ -31,7 +30,7 @@ if to_list == 'y':
     test_list = [val for val in test_list]
 
 if to_tuple == 'y':
-    test_list = (val for val in test_list)
+    test_list = tuple(val for val in test_list)
 
 for elem in generator(test_list):
     print(elem)
