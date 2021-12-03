@@ -41,7 +41,7 @@ def traffic_lights(end_point):
             sec_counter += 1
             yield f'{auto_lights + " " * (11 - len(auto_lights))}{people_ligts}'
         yield 'Done.'
-    except TypeError:
+    except ValueError:
         yield "Error! Enter number!"
 
 
@@ -49,3 +49,4 @@ user_input = input('Enter number of traffic lights iterations: ')
 
 for lights_iter in traffic_lights(user_input):
     print(lights_iter)
+
