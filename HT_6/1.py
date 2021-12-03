@@ -27,7 +27,7 @@ def traffic_lights(end_point):
     people_ligts = 'Green'
     sec_counter = 0
     try:
-        for _ in range(end_point):
+        for _ in range(int(end_point)):
             time.sleep(1)
             if sec_counter == 4 and auto_lights != 'Yellow':
                 auto_lights = 'Yellow'
