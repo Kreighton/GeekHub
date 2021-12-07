@@ -35,8 +35,8 @@ def func(text_file, syms):
 
 try:
     user_input = int(input("Enter value: "))
-    user_test = input("Enter test txt file number (0-2): ")
-    if user_test not in range(0, 2):
+    user_test = int(input("Enter test txt file number (0-2): "))
+    if user_test not in range(0, 3):
         raise ValueError()
     print(func(f'test_{user_test}.txt', user_input))
 except ValueError:
