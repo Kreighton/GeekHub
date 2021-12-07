@@ -21,6 +21,7 @@
 """
 
 import csv
+import json
 
 
 class InsufficientFunds(Exception):
@@ -56,8 +57,10 @@ def add_balance(login):
             user_funds = open(f'{login}_balance.data', 'w')
             user_funds.write(str(float(user_balance) + float(additional_funds)))
             user_funds.close()
+            transaction = {'add': str(additional_funds)}
+            transaction_json = json.dumps(transaction)
             transactions = open(f'{login}_transactions.data', 'a')
-            transactions.write(f'\n+{str(additional_funds)}')
+            transactions.write(f'\n{transaction_json}')
             transactions.close()
             return additional_funds
         else:
@@ -78,8 +81,10 @@ def drop_balance(login):
             user_funds = open(f'{login}_balance.data', 'w')
             user_funds.write(str(user_balance - drop_funds))
             user_funds.close()
+            transaction = {'drop': str(drop_funds)}
+            transaction_json = json.dumps(transaction)
             transactions = open(f'{login}_transactions.data', 'a')
-            transactions.write(f'\n-{str(drop_funds)}')
+            transactions.write(f'\n{transaction_json}')
             transactions.close()
             return f'Успех! Вы сняли {drop_funds} у.е.'
         else:
