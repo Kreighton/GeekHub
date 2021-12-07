@@ -67,14 +67,17 @@ def drop_balance(login):
     try:
         drop_funds = input("Введите сумму для снятия: ")
         if drop_funds.isdigit():
-            user_balance = open(f'{login}_balance.data', 'r').read()
+            user_balance = float(open(f'{login}_balance.data', 'r').read())
+            drop_funds = float(drop_funds)
+            if drop_funds > user_balance:
+                return "Ошибка! Недостаточно средств на счету!"
             user_funds = open(f'{login}_balance.data', 'w')
-            user_funds.write(str(float(user_balance) - float(drop_funds)))
+            user_funds.write(str(user_balance - drop_funds))
             user_funds.close()
             transactions = open(f'{login}_transactions.data', 'a')
             transactions.write(f'\n-{str(drop_funds)}')
             transactions.close()
-            return drop_funds
+            return f'Успех! Вы сняли {drop_funds} у.е.'
         else:
             raise ValueError
     except ValueError:
@@ -93,7 +96,7 @@ def start(login):
             elif some_operation == 2:
                 print(f'{"-" * 40}\nУспех! Счёт пользователя {login} был пополнен на {add_balance(login)} у.е.')
             elif some_operation == 3:
-                print(f'{"-" * 40}\nУспех! Вы сняли {drop_balance(login)} у.е.')
+                print(f'{"-" * 40}\n{drop_balance(login)}')
             elif some_operation == 4:
                 return '4 - Закрытие программы'
     except ValueError:
