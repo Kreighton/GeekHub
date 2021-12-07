@@ -23,6 +23,10 @@
 import csv
 
 
+class InsufficientFunds(Exception):
+    pass
+
+
 class WrongLogin(Exception):
     pass
 
@@ -70,7 +74,7 @@ def drop_balance(login):
             user_balance = float(open(f'{login}_balance.data', 'r').read())
             drop_funds = float(drop_funds)
             if drop_funds > user_balance:
-                return "Ошибка! Недостаточно средств на счету!"
+                raise InsufficientFunds()
             user_funds = open(f'{login}_balance.data', 'w')
             user_funds.write(str(user_balance - drop_funds))
             user_funds.close()
@@ -82,6 +86,8 @@ def drop_balance(login):
             raise ValueError
     except ValueError:
         return
+    except InsufficientFunds:
+        return "Ошибка! Недостаточно средств на счету!"
 
 
 def start(login):
