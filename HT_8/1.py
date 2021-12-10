@@ -69,33 +69,80 @@ def check_balance(login):
 
 
 def drop_balance(login):
+    # Функция заметно увеличилась :)
     print('3 - Снятие баланса')
     try:
-        dropped_funds = float(input('Введите количество средств для снятия\n'
+        dropped_funds = int(input('Введите количество средств для снятия\n'
                                     'Доступные купюры: 10, 20, 50, 100, 200, 500, 1000: '))
         if dropped_funds < 0:
             raise NegativeFunds()
-        sum_banknotes = 0
+        user_funds = int(open(f'{login}_balance.data', 'r').read())
+        if dropped_funds > user_funds:
+            raise InsufficientFunds()
+
+        # Банкноты, подтянутые из файла
+        total_banknotes = {}
+
+        # Банкноты, которые будут подсчитыватся для вывода пользователю. Все начинают с 0, в дальнейшем выведутся
+        # все, которые не 0
+        dropped_banknotes = {10: 0, 20: 0, 50: 0, 100: 0, 200: 0, 500: 0, 1000: 0}
+
+        # Вытягиваем банкноты из файла в дикт
         with open('incasator_funds.data', 'r') as temp:
             reader = json.load(temp)
             for row in reader:
-                sum_banknotes += int(row) * int(reader[row])
+                total_banknotes[int(row)] = int(reader[row])
             temp.close()
-        if dropped_funds > sum_banknotes:
-            raise InsufficientBanknotes()
-        user_funds = float(open(f'{login}_balance.data', 'r').read())
-        if dropped_funds > user_funds:
-            raise InsufficientFunds()
+
+        # Сразу проверка, ошибка если сумма всех банкнот меньше суммы, затребованой пользователем
+        if dropped_funds > sum([key * total_banknotes[key] for key in total_banknotes]):
+            raise InsufficientBanknotes
+
+        dropped_funds_local = dropped_funds
+        funds_avaliable_in_banknotes = 0
+
+        # Основной цикл для проверки, можно ли снять по присутствующим в файле банкнотам нужную сумму
+        while True:
+            # Счётчик неудачных попыток отнять банкноту для суммы.
+            # Если = 7, ошибка "недостаточно банкнот"
+            failed_drop = 0
+            for banknote in sorted(total_banknotes.keys(), reverse=True):
+                if dropped_funds_local // int(banknote) > 0 and int(total_banknotes[banknote]) > 0:
+                    # Убираем одну банкноту из дикта
+                    total_banknotes[banknote] = int(total_banknotes[banknote]) - 1
+                    # Добавляем банкноту в дикт для вывода
+                    dropped_banknotes[banknote] += 1
+                    # Сумма средств для проверки сходства с запрошенной суммой
+                    funds_avaliable_in_banknotes += int(banknote)
+                    # Локальная переменная запрошенной суммы для вычитания
+                    # Способствует завершению цикла while, если она <10
+                    dropped_funds_local -= int(banknote)
+                else:
+                    failed_drop += 1
+            if funds_avaliable_in_banknotes != dropped_funds and failed_drop == 7:
+                raise InsufficientBanknotes()
+            if dropped_funds_local < 10:
+                break
+        # Вносим изменения в файл, хранящий банкноты
+        with open('incasator_funds.data', 'w') as temp:
+            temp.write(json.dumps(total_banknotes))
+            temp.close()
+        # Вносим изменения в баланс
         with open(f'{login}_balance.data', 'w') as temp:
                 temp.write(str(user_funds - dropped_funds))
                 temp.close()
+        # Добавляем транзакцию
         add_transaction(login, 'drop', dropped_funds)
-        return f'Поздравляем! Со счёта пользователя {login} было снято {dropped_funds} у.е'
+        result = ''
+        for key in dropped_banknotes.keys():
+            if dropped_banknotes[key] > 0:
+                result += f'\n{dropped_banknotes[key]} банкнот по {key}'
+        return f'Поздравляем! Со счёта пользователя {login} было снято {dropped_funds} у.е.{result}'
 
     except NegativeFunds:
         return 'Вы ввели некорректную сумму! Возврат в главное меню'
     except ValueError:
-        return 'Вы ввели буквы! Возврат в главное меню'
+        return 'Вы ввели некорректную сумму! Возврат в главное меню'
     except InsufficientFunds:
         return 'Недостаточно средств! Возврат в главное меню'
     except InsufficientBanknotes:
@@ -204,6 +251,8 @@ def start(login, incasator=False):
 
     except ValueError:
         return 'error'
+    except WrongOperationError:
+        return 'Введите правильный номер операции!'
 
 
 
