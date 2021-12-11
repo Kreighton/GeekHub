@@ -76,7 +76,7 @@ def drop_balance(login):
                                     'Доступные купюры: 10, 20, 50, 100, 200, 500, 1000: '))
         if dropped_funds < 0:
             raise NegativeFunds()
-        user_funds = int(open(f'{login}_balance.data', 'r').read())
+        user_funds = int(float(open(f'{login}_balance.data', 'r').read()))
         if dropped_funds > user_funds:
             raise InsufficientFunds()
 
@@ -141,10 +141,10 @@ def drop_balance(login):
 
     except NegativeFunds:
         return 'Вы ввели некорректную сумму! Возврат в главное меню'
-    except ValueError:
-        return 'Вы ввели некорректную сумму! Возврат в главное меню'
     except InsufficientFunds:
         return 'Недостаточно средств! Возврат в главное меню'
+    except ValueError:
+        return 'Ошибка ввода! Возврат в главное меню'
     except InsufficientBanknotes:
         return 'В банкомате недостаточно средств! Возврат в главное меню'
 
@@ -183,31 +183,28 @@ def add_bankomat_funds():
     banknotes = {}
     print('2 - Изменить кол-во купюр в банкомате')
     try:
-        banknotes_value = input('Введите купюру: ')
-        banknotes_num = input('Введите количество купюр: ')
-        if banknotes_num.isdigit() and banknotes_value.isdigit():
-            if int(banknotes_num) < 0:
-                raise NegativeFunds()
-            else:
-                with open('incasator_funds.data', 'r') as temp:
-                    reader = json.load(temp)
-                    for row in reader:
-                        banknotes[row] = reader[row]
-                    temp.close()
-                if banknotes_value in banknotes.keys():
-                    banknotes[banknotes_value] = banknotes_num
-                    with open('incasator_funds.data', 'w') as temp:
-                        temp.write(json.dumps(banknotes))
-                        temp.close()
-                    return f'Вы изменили кол-во банкнот {banknotes_value} на {banknotes_num} штук'
-                else:
-                    raise NoSuchBanknote()
+        banknotes_value = int(input('Введите купюру: '))
+        banknotes_num = int(input('Введите количество купюр: '))
+        if banknotes_num < 0:
+            raise NegativeFunds()
         else:
-            raise ValueError()
+            with open('incasator_funds.data', 'r') as temp:
+                reader = json.load(temp)
+                for row in reader:
+                    banknotes[row] = reader[row]
+                temp.close()
+            if str(banknotes_value) in banknotes.keys():
+                banknotes[str(banknotes_value)] = banknotes_num
+                with open('incasator_funds.data', 'w') as temp:
+                    temp.write(json.dumps(banknotes))
+                    temp.close()
+                return f'Вы изменили кол-во банкнот {banknotes_value} на {banknotes_num} штук'
+            else:
+                raise NoSuchBanknote()
     except NegativeFunds:
         return 'Вы ввели некорректную сумму! Возврат в главное меню'
     except ValueError:
-        return 'Вы ввели буквы! Возврат в главное меню'
+        return 'Ошибка ввода! Возврат в главное меню'
     except NoSuchBanknote:
         return 'Такой банкноты не существует! Возврат в главное меню'
 
