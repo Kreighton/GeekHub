@@ -67,12 +67,17 @@ def check_balance(login):
 
 def drop_balance(login):
     print('3 - Снятие баланса')
+    con = sqlite3.connect('users.db')
+    cur = con.cursor()
     try:
-        dropped_funds = int(input('Введите количество средств для снятия\n'
-                                    'Доступные купюры: 10, 20, 50, 100, 200, 500, 1000: '))
+        # Вытягиваем банкноты из таблицы
+        total_banknotes = cur.execute('SELECT banknote_value, banknote_total FROM banknotes').fetchall()
+        total_banknotes_dict = {total_banknotes[i][0]: total_banknotes[i][1] for i in range(len(total_banknotes))}
+        print(f'{"-" * 40}\nДоступное количество купюр:')
+        print('\n'.join(f'{key} = {total_banknotes_dict[key]}' for key in total_banknotes_dict))
+        dropped_funds = int(input('Введите количество средств для снятия: '))
 
-        con = sqlite3.connect('users.db')
-        cur = con.cursor()
+
         user_id = cur.execute('select id from user_logs where user_login=?', (login,)).fetchone()
         user_funds = cur.execute('select user_balance from balance where id=?', (user_id[0],)).fetchone()[0]
         if dropped_funds < 0:
@@ -80,9 +85,7 @@ def drop_balance(login):
         if dropped_funds > user_funds:
             raise InsufficientFunds()
 
-        # Вытягиваем банкноты из таблицы
-        total_banknotes = cur.execute('SELECT banknote_value, banknote_total FROM banknotes').fetchall()
-        total_banknotes_dict = {total_banknotes[i][0]: total_banknotes[i][1] for i in range(len(total_banknotes))}
+
         # Банкноты, которые будут подсчитыватся для вывода пользователю. Все начинают с 0, в дальнейшем выведутся
         # все, которые не 0
         dropped_banknotes = {10: 0, 20: 0, 50: 0, 100: 0, 200: 0, 500: 0, 1000: 0}
