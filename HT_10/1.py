@@ -35,6 +35,8 @@ import sqlite3
 import requests
 from datetime import date, timedelta, datetime
 import time
+
+
 class WrongDateInput(Exception):
     pass
 class CurrencyNotExists(Exception):
