@@ -35,8 +35,6 @@ import sqlite3
 import requests
 from datetime import date, timedelta, datetime
 import time
-
-
 class WrongDateInput(Exception):
     pass
 class CurrencyNotExists(Exception):
@@ -177,7 +175,7 @@ def drop_balance(login):
     except InsufficientBanknotes:
         return 'В банкомате недостаточно средств! Возврат в главное меню'
 
-#done
+
 def add_balance(login):
     print('2 - Пополнение баланса')
     try:
@@ -200,7 +198,6 @@ def add_balance(login):
     except ValueError:
         return 'Вы ввели буквы! Возврат в главное меню'
 
-#done
 def check_bankomat_funds():
     result = ''
     con = sqlite3.connect('users.db')
@@ -211,7 +208,6 @@ def check_bankomat_funds():
         result += f'Количество банкнот {banknote[0]} = {banknote[1]}\n'
     return result
 
-#done
 def add_bankomat_funds():
     con = sqlite3.connect('users.db')
     cur = con.cursor()
@@ -244,7 +240,8 @@ def daterange(custom_date):
 
 
 def getcurrency_history(custom_date, currency):
-    currencies = ['USD', 'EUR', 'RUR', 'CHF', 'GBP', 'PLZ', 'SEK', 'XAU', 'CAD']
+    currencies = ["AZN", "BYN", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HUF", "ILS", "JPY", "KZT", "MDL",
+                  "NOK", "PLN", "RUB", "SEK", "SGD", "TMT", "TRY", "UAH", "USD", "UZS", "GEL"]
     try:
         if currency not in currencies:
             raise CurrencyNotExists()
@@ -277,39 +274,37 @@ def getcurrency_history(custom_date, currency):
 
 def curr_converter(curr_from, curr_to, curr_value):
     try:
-        converted_value = 0
         curr_value = float(curr_value)
-        result = 0
-        func_currency = ''
-        move_hist = ''
-        move = ''
-        curs_for_sale = ['USD', 'EUR', 'RUR']
-        if curr_from == curr_to:
-            result = curr_value
-        elif curr_from in curs_for_sale and curr_to == 'UAH':
-            move = 'sale'
-            move_hist = 'saleRateNB'
-            func_currency = curr_from
-        elif curr_from == 'UAH' and curr_to in curs_for_sale:
-            move = 'buy'
-            move_hist = 'purchaseRateNB'
-            func_currency = curr_to
-        else:
-            raise CurrencyNotExists()
-        if move:
-            url = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
-            temp = requests.get(url=url).json()
-            converted_value = float([temp[i][move] for i in range(len(temp)) if temp[i]['ccy'] == func_currency][0])
-            if converted_value == 0:
+        if curr_value < 0:
+            raise ValueError()
+
+        curs_for_sale = ["AZN", "BYN", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HUF", "ILS", "JPY",
+                         "KZT", "MDL", "NOK", "PLN", "RUB", "SEK", "SGD", "TMT", "TRY", "UAH", "USD", "UZS", "GEL"]
+        if curr_from in curs_for_sale and curr_to in curs_for_sale:
+
+            url = f'https://api.privatbank.ua/p24api/exchange_rates?json&date={date.today().strftime("%d.%m.%Y")}'
+            temp = requests.get(url=url).json()['exchangeRate']
+            converted_value = float([temp[i]['currency'] for i in range(len(temp)) if temp[i]['currency'] == curr_from][0])
+            if not converted_value:
                 yesterdays_date = (date.today() - timedelta(days=1)).strftime("%d.%m.%Y")
                 url = f'https://api.privatbank.ua/p24api/exchange_rates?json&date={yesterdays_date}'
                 temp = requests.get(url=url).json()['exchangeRate']
-                converted_value = float([temp[i][move_hist] for i in range(1, len(temp)) if temp[i]['currency'] == func_currency][0])
-            if move == 'buy':
-                result = curr_value / converted_value
+
+            if curr_from == curr_to:
+                result = curr_value
+            elif curr_from == 'UAH':
+                move = [temp[i]['saleRateNB'] for i in range(1, len(temp)) if temp[i]['currency'] == curr_to][0]
+                result = curr_value / move
+            elif curr_to == 'UAH':
+                move = [temp[i]['purchaseRateNB'] for i in range(1, len(temp)) if temp[i]['currency'] == curr_from][0]
+                result = curr_value * move
             else:
-                result = curr_value * converted_value
-        return f"{curr_value} {curr_from} в {curr_to} = {result} {curr_to}"
+                move_1 = [temp[i]['purchaseRateNB'] for i in range(1, len(temp)) if temp[i]['currency'] == curr_from][0]
+                move_2 = [temp[i]['saleRateNB'] for i in range(1, len(temp)) if temp[i]['currency'] == curr_to][0]
+                result = curr_value * move_1 / move_2
+            return f"{curr_value} {curr_from} в {curr_to} = {result} {curr_to}"
+        else:
+            raise CurrencyNotExists
     except CurrencyNotExists:
         return 'Вы ввели неверную валюту! Возврат в главное меню.'
     except ValueError:
@@ -352,12 +347,18 @@ def start(login, incasator=False):
                     elif user_operation == 5:
                         print('5 - История курса валют.')
                         currency = input('Введите дату (формат дд.мм.гггг): ')
-                        custom_date = input('Введите валюту для просмотра (USD, EUR, RUR, CHF, GBP, PLZ, SEK, XAU, CAD): ')
+                        custom_date = input('Введите валюту для просмотра (AZN, BYN, CAD, CHF, CNY, CZK, DKK, EUR, GBP, '
+                                            'HUF, ILS, JPY, KZT, MDL, NOK, PLN, RUB, SEK, SGD, '
+                                            'TMT, TRY, UAH, USD, UZS, GEL): ')
                         print(f'{"-" * 30}\n{getcurrency_history(currency, custom_date)}')
                     elif user_operation == 6:
-                        print('6 - Конвертер валют. Конверсия может быть проведена только между UAH и другими валютами.')
-                        curr_from = input('Введите стартовую валюту (Доступные валюты: UAH, USD, RUR, USD): ')
-                        curr_to = input('Введите валюту для конвертирования (Доступные валюты: UAH, USD, RUR, USD): ')
+                        print('6 - Конвертер валют.')
+                        curr_from = input('Введите стартовую валюту (Доступные валюты: AZN, BYN, CAD, CHF, '
+                                          'CNY, CZK, DKK, EUR, GBP, HUF, ILS, JPY, KZT, MDL, '
+                                          'NOK, PLN, RUB, SEK, SGD, TMT, TRY, UAH, USD, UZS, GEL): ')
+                        curr_to = input('Введите валюту для конвертирования (Доступные валюты: AZN, BYN, CAD, CHF, '
+                                        'CNY, CZK, DKK, EUR, GBP, HUF, ILS, JPY, KZT, MDL, '
+                                        'NOK, PLN, RUB, SEK, SGD, TMT, TRY, UAH, USD, UZS, GEL): ')
                         curr_value = input('Введите сумму для конвертирования: ')
                         print(f'{"-" * 30}\n{curr_converter(curr_from, curr_to, curr_value)}')
                     elif user_operation == 7:
