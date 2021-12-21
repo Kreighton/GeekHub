@@ -33,6 +33,8 @@ import json
 import csv
 import sqlite3
 import requests
+
+
 from datetime import date, timedelta, datetime
 import time
 class WrongDateInput(Exception):
@@ -97,68 +99,58 @@ def drop_balance(login):
     con = sqlite3.connect('users.db')
     cur = con.cursor()
     try:
-        # Вытягиваем банкноты из таблицы
         total_banknotes = cur.execute('SELECT banknote_value, banknote_total FROM banknotes').fetchall()
         total_banknotes_dict = {total_banknotes[i][0]: total_banknotes[i][1] for i in range(len(total_banknotes))}
         print(f'{"-" * 40}\nДоступное количество купюр:')
         print('\n'.join(f'{key} = {total_banknotes_dict[key]}' for key in total_banknotes_dict))
         dropped_funds = int(input('Введите количество средств для снятия: '))
 
-
         user_id = cur.execute('select id from user_logs where user_login=?', (login,)).fetchone()
         user_funds = cur.execute('select user_balance from balance where id=?', (user_id[0],)).fetchone()[0]
+
         if dropped_funds < 0:
             raise NegativeFunds()
         if dropped_funds > user_funds:
             raise InsufficientFunds()
+        dropped_banknotes = {}
+        rest_of_funds = dropped_funds
 
-
-        # Банкноты, которые будут подсчитыватся для вывода пользователю. Все начинают с 0, в дальнейшем выведутся
-        # все, которые не 0
-        dropped_banknotes = {10: 0, 20: 0, 50: 0, 100: 0, 200: 0, 500: 0, 1000: 0}
-
-        # Сразу проверка, ошибка если сумма всех банкнот меньше суммы, затребованой пользователем
-        if dropped_funds > sum([total_banknotes[i][0] * total_banknotes[i][1] for i in range(len(total_banknotes))]):
-            raise InsufficientBanknotes
-
-        dropped_funds_local = dropped_funds
-        funds_avaliable_in_banknotes = 0
-
-        # Основной цикл для проверки, можно ли снять по присутствующим в файле банкнотам нужную сумму
-        while True:
-            # Счётчик неудачных попыток отнять банкноту для суммы.
-            # Если = 7, ошибка "недостаточно банкнот"
-            failed_drop = 0
-            for banknote in sorted(total_banknotes_dict.keys(), reverse=True):
-                if dropped_funds_local // int(banknote) > 0 and int(total_banknotes_dict[banknote]) > 0:
-                    # Убираем одну банкноту из дикта
-                    total_banknotes_dict[banknote] -= 1
-                    # Добавляем банкноту в дикт для вывода
-                    dropped_banknotes[banknote] += 1
-                    # Сумма средств для проверки сходства с запрошенной суммой
-                    funds_avaliable_in_banknotes += int(banknote)
-                    # Локальная переменная запрошенной суммы для вычитания
-                    # Способствует завершению цикла while, если она <10
-                    dropped_funds_local -= int(banknote)
+        for nominal in sorted(total_banknotes_dict, reverse=True):
+            if not total_banknotes_dict[nominal]:
+                continue
+            nominals_to_give = rest_of_funds // nominal
+            if not nominals_to_give:
+                continue
+            nominals_to_give = min(nominals_to_give, total_banknotes_dict[nominal])
+            while nominals_to_give:
+                rest_of_funds = rest_of_funds - nominal * nominals_to_give
+                if not rest_of_funds:
+                    dropped_banknotes[nominal] = nominals_to_give
+                    break
+                for nominal2 in sorted(total_banknotes_dict, reverse=True):
+                    if nominal2 >= nominal or not total_banknotes_dict[nominal2]:
+                        continue
+                    if rest_of_funds % nominal2 == 0:
+                        break
                 else:
-                    failed_drop += 1
-            if funds_avaliable_in_banknotes != dropped_funds and failed_drop == 7:
-                raise InsufficientBanknotes()
-            if dropped_funds_local < 10:
+                    rest_of_funds = rest_of_funds + nominal * nominals_to_give
+                    nominals_to_give -= 1
+                    continue
+                dropped_banknotes[nominal] = nominals_to_give
+                break
+            if not rest_of_funds:
                 break
 
-        # Вносим изменения в файл, хранящий банкноты
+
         total_banknotes = [(total_banknotes_dict[key], key) for key in total_banknotes_dict]
         cur.executemany('UPDATE banknotes SET banknote_total=? WHERE banknote_value=?', total_banknotes)
 
-        # Вносим изменения в баланс
         user_id = cur.execute('select id from user_logs where user_login=?', (login,)).fetchone()
         user_funds = cur.execute('select user_balance from balance where id=?', (user_id[0],)).fetchone()
         cur.execute('UPDATE balance SET user_balance=? WHERE id=?', (user_funds[0] - dropped_funds, user_id[0]))
         con.commit()
         con.close()
 
-        # Добавляем транзакцию
         add_transaction(login, 'drop', dropped_funds)
         result = ''
         for key in dropped_banknotes.keys():
@@ -406,3 +398,4 @@ while True:
     else:
         try_counter -= 1
         print(f'{"-" * 30}\nОшибка ввода логина/пароля. Осталось {try_counter} попыток')
+
