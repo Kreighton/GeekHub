@@ -276,7 +276,7 @@ def curr_converter(curr_from, curr_to, curr_value):
 
             url = f'https://api.privatbank.ua/p24api/exchange_rates?json&date={date.today().strftime("%d.%m.%Y")}'
             temp = requests.get(url=url).json()['exchangeRate']
-            converted_value = float([temp[i]['currency'] for i in range(len(temp)) if temp[i]['currency'] == curr_from][0])
+            converted_value = [temp[i].get('saleRateNB') for i in range(len(temp)) if temp[i].get('currency') == curr_from]
             if not converted_value:
                 yesterdays_date = (date.today() - timedelta(days=1)).strftime("%d.%m.%Y")
                 url = f'https://api.privatbank.ua/p24api/exchange_rates?json&date={yesterdays_date}'
