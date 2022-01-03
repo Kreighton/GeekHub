@@ -11,14 +11,8 @@ create table books(id integer primary key autoincrement, book_name text, author 
 '''
 import sqlite3
 
-con = sqlite3.connect('db.sql')
-cur = con.cursor()
-cur.execute('create table books(id integer primary key autoincrement, book_name text, author text, pages integer, janra text, edition text')
-con.commit()
-con.close()
 
-
-class SchoolLibrary(object):
+class Book(object):
 
     def __init__(self, *args):
         self.book_name = args[0]
@@ -26,16 +20,22 @@ class SchoolLibrary(object):
         self.pages = args[2]
         self.janra = args[3]
         self.edition = args[4]
+        
 
-    def add_book(self):
-        con = sqlite3.connect('db.sql')
-        cur = con.cursor()
-        cur.execute('INSERT INTO books (book_name, author, pages, janra, edition) VALUES (?,?,?,?,?)',
-                    (self.book_name, self.author, self.pages, self.janra, self.edition))
-        con.commit()
-        con.close()
-        print(f'Added book {self.book_name}')
-        return
-    
-book_1 = SchoolLibrary('Eye of ctulhu', 'Hovard Lovecraft', 314, 'Horror', 'asdasd')
-book_1.add_book()
+    def show_book(self):
+        print(self.book_name, self.author, self.pages, self.janra, self.edition)
+        
+class Dictionary(Book):
+
+    def __init__(self, lang_to, lang_in, *args):
+        self.lang_to = lang_to
+        self.lang_in = lang_in
+        super(Dictionary, self).__init__(*args)
+
+class 
+book_1 = Book('Eye of ctulhu', 'Hovard Lovecraft', 314, 'Horror', 'asdasd')
+
+book_1.show_book()
+
+book_2 = Dictionary('English', 'German', 'English-German general dictionary', 'Someone', 890, 'Dictionary', 'asdasd')
+book_2.show_book()
