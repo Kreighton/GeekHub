@@ -2,27 +2,13 @@
 
 class Thing(object):
 
-    def __init__(self, object_type):
-        self.object_type = type(object_type)
-
-    def __str__(self):
-        return f'{self.object_type}'
+    def detect_type(self, example):
+        return type(example)
 
 
-example = Thing('a')
-print(example)
 
-example = Thing(1)
-print(example)
+example = Thing()
 
-example = Thing(True)
-print(example)
-
-example = Thing([1, 2])
-print(example)
-
-example = Thing((1, 2))
-print(example)
-
-example = Thing({1: 2, 3: 4})
-print(example)
+print(example.detect_type(1))
+print(example.detect_type('asd'))
+print(example.detect_type([1, 2, 3]))
