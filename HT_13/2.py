@@ -1,25 +1,27 @@
-'''2. Створити клас Person, в якому буде присутнім метод __init__ який буде приймати * аргументів, які зберігатиме в відповідні змінні. Методи, які повинні бути в класі Person - show_age, print_name, show_all_information.
+'''2. Створити клас Person, в якому буде присутнім метод __init__ який буде приймати * аргументів, які зберігатиме в відповідні змінні.
+Методи, які повинні бути в класі Person - show_age, print_name, show_all_information.
    - Створіть 2 екземпляри класу Person та в кожному з екземплярів створіть атребут profession.'''
-   
+
+
 class Person(object):
-    profession = 'No one'
-    
+
     def __init__(self, *args):
-            self.name = args[0]
-            self.age = args[1]
-            self.id = args[2]
+        self.name = args[0]
+        self.age = args[1]
+        self.id = args[2]
 
     def show_age(self):
         print(f'Age of {self.name} = {self.age}')
+
     def print_name(self):
         print(f'Name = {self.name}')
+
     def show_all_information(self):
         print(f'Name = {self.name}')
         print(f'Age = {self.age}')
-        print(f'Proffession = {self.profession}')
         print(f'ID number = {self.id}')
-    
-    
+
+
 per_1 = Person('Pavel', 24, 134488)
 per_1.show_age()
 per_1.print_name()
