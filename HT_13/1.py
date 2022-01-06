@@ -32,7 +32,10 @@ class Calc(object):
 
     def divide_digits(self, a, b):
         """A function for dividing 2 values, integer or float"""
-        self.last_result = a / b
+        try:
+            self.last_result = a / b
+        except ZeroDivisionError:
+            print('Error, you cannot make divisions by zero!')
 
 
 calc_1 = Calc()
@@ -50,7 +53,7 @@ print(calc_2.last_result)
 calc_3.multiple_digits(5, 2)
 print(calc_3.last_result)
 
-calc_4.divide_digits(100, 10)
+calc_4.divide_digits(100, 0)
 print(calc_4.last_result)
 
 print(Calc.__doc__)
