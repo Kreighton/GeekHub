@@ -89,7 +89,6 @@ class UserOperations(object):
         con.close()
         return
 
-
     def check_balance(self):
         con = sqlite3.connect('users.db')
         cur = con.cursor()
@@ -120,7 +119,6 @@ class UserOperations(object):
             return 'Вы ввели некорректную сумму! Возврат в главное меню'
         except ValueError:
             return 'Вы ввели буквы! Возврат в главное меню'
-
 
     def drop_balance(self):
         print('3 - Снятие баланса')
@@ -194,7 +192,6 @@ class UserOperations(object):
         except InsufficientBanknotes:
             return 'В банкомате недостаточно средств! Возврат в главное меню'
 
-
     def getcurrency_current(self):
         url = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
         a = requests.get(url=url).json()
@@ -205,11 +202,9 @@ class UserOperations(object):
                           f'{a[i]["sale"]}\n{"-" * 40}\n' for i in range(len(a))])
         return result
 
-
     def daterange(self, custom_date):
         for i in range(int((date.today() - custom_date).days) + 1):
             yield custom_date + timedelta(i)
-
 
     def getcurrency_history(self, custom_date, currency):
         currencies = ["AZN", "BYN", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HUF", "ILS", "JPY", "KZT", "MDL",
@@ -245,7 +240,6 @@ class UserOperations(object):
             return 'Неверно введенная дата! Возврат в главное меню'
         except ValueError:
             return 'Неверно введенная дата! Возврат в главное меню'
-
 
     def curr_converter(self,curr_from, curr_to, curr_value):
         try:
@@ -287,9 +281,6 @@ class UserOperations(object):
             return 'Введеная неверная валюта или сумма для обмена! Возврат в главное меню.'
 
 
-
-
-
 class AuthCustom(object):
 
     def login_pword_check(self, login, pword):
@@ -305,7 +296,6 @@ class AuthCustom(object):
             if is_account_exists[0] == 1:
                 incasation = True
         return login_accepted, incasation
-
 
     def log_in(self):
         try_counter = 3
@@ -323,7 +313,6 @@ class AuthCustom(object):
             else:
                 try_counter -= 1
                 print(f'{"-" * 30}\nОшибка ввода логина/пароля. Осталось {try_counter} попыток')
-
 
     def start(self, login, incasator=False):
         try:
@@ -372,16 +361,16 @@ class AuthCustom(object):
                     else:
                         raise WrongOperationError()
                 else:
-                    user_user = IncasOperations(login)
+                    user_root = IncasOperations(login)
                     print(f'{"-" * 40}\nПриветствую, {login} (инкасатор) Выберите операцию!')
                     incas_operation = int(input('1. Проверить наличие купюр\n'
                                                 '2. Изменить кол-во купюр в банкомате\n'
                                                 '3. Выход\n'))
                     if incas_operation in range(1, 4):
                         if incas_operation == 1:
-                            print(f'{"-" * 40}\n{user_user.check_bankomat_funds()}')
+                            print(f'{"-" * 40}\n{user_root.check_bankomat_funds()}')
                         if incas_operation == 2:
-                            print(f'{"-" * 40}\n{user_user.add_bankomat_funds()}')
+                            print(f'{"-" * 40}\n{user_root.add_bankomat_funds()}')
                         if incas_operation == 3:
                             print('3 - Выход')
                             return
