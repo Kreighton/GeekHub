@@ -66,10 +66,13 @@ class VikkascrapeSpider(scrapy.Spider):
             cb_kwargs=dict(csv_name=csv_name)
         )
     def parse_news(self, news, csv_name):
+        article_body = ''
         soup = BeautifulSoup(news.text, "lxml")
         vikkaitems = VikkaItem()
         vikkaitems['title'] = soup.select_one('h1.post-title').text
-        vikkaitems['article_body'] = soup.select_one('.entry-content').text
+        for i in soup.select_one('.entry-content'):
+            article_body += f'{i.text}\n'
+        vikkaitems['article_body'] = article_body
         vikkaitems['tags'] = ', '.join([f'#{i.text}' for i in soup.select('.post-tag')])
         vikkaitems['url'] = news.url
         vikkaitems['year'] = csv_name
