@@ -16,6 +16,7 @@ class VikkaPipeline(object):
     def process_item(self, item, spider):
         table_name = f'news_{item.pop("table_date")}'
         inserted_data = [item[k] for k in item]
+        delete_from_tabe = """DELETE FROM {table}"""
         insert_into_table = """INSERT INTO {table}(
         article_title, 
         article_body, 
@@ -29,7 +30,10 @@ class VikkaPipeline(object):
         tags text, 
         url text)"""
 
-        self.cur.execute(create_customname_table.format(table=table_name))
+        if self.counter == 0:
+            self.cur.execute(create_customname_table.format(table=table_name))
+            self.cur.execute(delete_from_tabe.format(table=table_name))
+            self.counter = 1
         self.cur.execute(insert_into_table.format(table=table_name), tuple(inserted_data))
 
         return item
@@ -37,6 +41,7 @@ class VikkaPipeline(object):
     def open_spider(self, spider):
         self.con = sqlite3.connect('main.db')
         self.cur = self.con.cursor()
+        self.counter = 0
 
     def close_spider(self, spider):
         self.con.commit()
