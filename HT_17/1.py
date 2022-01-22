@@ -36,3 +36,5 @@ wd.save_screenshot('filled_form.png')
 btn_to_click = wd.find_element(By.XPATH, "//span[@class='appsMaterialWizButtonPaperbuttonLabel quantumWizButtonPaperbuttonLabel exportLabel']")
 btn_to_click.click()
 wd.save_screenshot('btn_pressed.png')
+
+wd.close()
