@@ -20,7 +20,6 @@ import json
 import csv
 import datetime
 
-from bs4 import BeautifulSoup
 
 class WrongCategoryError(Exception):
     pass
@@ -33,7 +32,6 @@ class GetAllNews(object):
         self.current_category = self.get_url_category()
         self.tdate = datetime.datetime.today()
 
-
     def get_url_category(self):
         url_cat = input('Enter news category (askstories, showstories, newstories, jobstories): ')
         if url_cat == '':
@@ -44,17 +42,16 @@ class GetAllNews(object):
             self.flag = False
 
     def get_ids_list(self):
-        if self.flag == False:
+        if not self.flag:
             return
         category_url = f'https://hacker-news.firebaseio.com/v0/{self.current_category}.json'
         list_of_articles = requests.get(url=category_url).json()
         return list_of_articles
 
-
     def get_news_csv(self):
         try:
             list_of_articles = self.get_ids_list()
-            if self.flag == False:
+            if not self.flag:
                 raise WrongCategoryError()
 
             all_news_list = []
@@ -66,7 +63,6 @@ class GetAllNews(object):
                 print(i)
                 all_news_list.append(request)
                 fieldnames.update(request.keys())
-
 
             fieldnames = sorted(fieldnames)
             filename = f'{self.current_category}_{self.tdate.strftime("%Y_%m_%d")}.csv'
@@ -80,6 +76,6 @@ class GetAllNews(object):
             print('Selected wrong category!')
             return
 
-
-temp = GetAllNews()
-temp.get_news_csv()
+if __name__ == '__main__':
+    temp = GetAllNews()
+    temp.get_news_csv()
