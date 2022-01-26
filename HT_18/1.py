@@ -26,14 +26,13 @@ class WrongCategoryError(Exception):
 
 
 class GetAllNews(object):
-    def __init__(self):
+    def __init__(self, current_category):
         self.flag = True
         self.categories = ('askstories', 'showstories', 'newstories', 'jobstories')
-        self.current_category = self.get_url_category()
+        self.current_category = self.get_url_category(current_category)
         self.tdate = datetime.datetime.today()
 
-    def get_url_category(self):
-        url_cat = input('Enter news category (askstories, showstories, newstories, jobstories): ')
+    def get_url_category(self, url_cat):
         if url_cat == '':
             return 'newstories'
         elif url_cat in self.categories:
@@ -60,9 +59,13 @@ class GetAllNews(object):
             for i in list_of_articles:
                 temp_url = f'https://hacker-news.firebaseio.com/v0/item/{i}.json'
                 request = requests.get(url=temp_url).json()
-                print(i)
-                all_news_list.append(request)
-                fieldnames.update(request.keys())
+                if not request:
+                    print(f'{i} = NULL')
+                    continue
+                else:
+                    print(i)
+                    all_news_list.append(request)
+                    fieldnames.update(request.keys())
 
             fieldnames = sorted(fieldnames)
             filename = f'{self.current_category}_{self.tdate.strftime("%Y_%m_%d")}.csv'
@@ -77,5 +80,10 @@ class GetAllNews(object):
             return
 
 if __name__ == '__main__':
-    temp = GetAllNews()
+    import sys
+    if len(sys.argv) == 1:
+        cmd_input = ''
+    else:
+        cmd_input = sys.argv[1]
+    temp = GetAllNews(cmd_input)
     temp.get_news_csv()
