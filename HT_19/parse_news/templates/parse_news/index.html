@@ -1,0 +1,13 @@
+{% extends "./base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <form method="post">
+        <h1>Enter news category:</h1>
+        <div class="mb-3">
+            {% csrf_token %}
+            {{ form|crispy }}
+            </div>
+        <input type="submit" class="btn btn-primary" value="Press" name="press">
+    </form>
+{% endblock content %}
