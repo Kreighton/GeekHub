@@ -60,5 +60,6 @@ def get_news_csv(current_category):
             setattr(news, k, v)
             news.category_fk_id = category_list[current_category]
             news.save()
+    return 
 
 
