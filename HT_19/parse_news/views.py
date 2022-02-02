@@ -35,6 +35,11 @@ def get_ids_list(current_category):
 
 
 def get_news_csv(current_category):
+    ids_list = [i.id for i in News.objects.all()]
+    ids_list.append([i.id for i in Ask.objects.all()])
+    ids_list.append([i.id for i in Job.objects.all()])
+    ids_list.append([i.id for i in Work.objects.all()])
+
     curent_models = {'newstories': News(), 'askstories': Ask(), 'jobstories': Job(), 'showstories': Work()}
     news = curent_models[current_category]
 
@@ -42,20 +47,18 @@ def get_news_csv(current_category):
     category_list = {i.cus_cat: i.id for i in Category.objects.all()}
 
     for i in list_of_articles:
-        ids_list = [i.id for i in News.objects.all()]
-        ids_list.append([i.id for i in Ask.objects.all()])
-        ids_list.append([i.id for i in Job.objects.all()])
-        ids_list.append([i.id for i in Work.objects.all()])
-
+        if i in ids_list:
+            continue
 
         temp_url = f'https://hacker-news.firebaseio.com/v0/item/{i}.json'
         c_request = requests.get(url=temp_url).json()
-        if not c_request or c_request['id'] in ids_list:
+
+        if not c_request:
             continue
-        else:
-            for k, v in c_request.items():
-                setattr(news, k, v)
-                news.category_fk_id = category_list[current_category]
+
+        for k, v in c_request.items():
+            setattr(news, k, v)
+            news.category_fk_id = category_list[current_category]
             news.save()
 
 
