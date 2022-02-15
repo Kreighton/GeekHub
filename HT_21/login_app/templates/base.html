@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'login_app/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>{% block title %}{% endblock title %}</title>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Home</a>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% for i in categories %}
+                  <li class="nav-item">
+                       <a href="/{{ i.slug }}" class="nav-link active">{{ i.category_name }}</a>
+                  </li>
+              {% endfor %}
+              <li class="nav-item">
+                       <b><a href="/cart/" class="nav-link active">Cart</a></b>
+                  </li>
+          </ul>
+
+        </div>
+      <div class="d-flex flex-row-reverse">
+        {% if user.is_authenticated  %}
+            <span class="navbar-text"> Hello, {{ user.username }}</span>
+            <a class="nav-link active" aria-current="page" href="/logout/">Log out</a>
+        {% else %}
+             <a class="nav-link active" aria-current="page" href="/login/">Log in</a>
+        {% endif %}
+            </div>
+  </div>
+</nav>
+</head>
+<body>
+
+    <div class="container">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% include "cats.html" %}
+{% load static %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% else %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if data %}
+    {% for item in data %}
+        <div><h3>Название товара: {{ item.product_name }}</h3></div>
+        <div><h4>Цена: {{ item.product_price }} грн.</h4></div>
+        </br>
+        <hr>
+    {% endfor %}
+    <div><h1>Общая стоимость заказа: {{ total }} грн.</h1></div>
+    </br>
+    <a href="/commit-order/" class="btn btn-success">Подтвердить заказ</a>
+    <a href="/clear-cart/" class="btn btn-danger">Очистить корзину</a>
+{% else %}
+    <div><h1>Товары отсутствуют</h1></div>
+{% endif %}
+
+{% endblock %}

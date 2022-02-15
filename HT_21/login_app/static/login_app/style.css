@@ -1,0 +1,27 @@
+ul.errorlist.nonfield {
+display:none !important;
+}
+
+div.alert.alert-block.alert-danger {
+display:none !important;
+}
+
+.error_message {
+color: #D75252
+}
+:root {
+  --gradient: linear-gradient(to left top, #DD2476 10%, #FF512F 90%) !important;
+}
+
+
+
+
+.card{
+height: 500px;
+}
+
+.card-body{
+position: absolute;
+bottom: 0;
+}
+

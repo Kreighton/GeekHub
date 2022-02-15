@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% include "cats.html" %}
+{% load static %}
+
+{% block content %}
+
+
+
+
+<div class="container mx-auto mt-4">
+  <div class="row">
+  {% for item in data %}
+    <div class="col-md-4">
+      <div class="card" style="width: 18rem;">
+        <a href="{{ item.get_absolute_url }}">
+          <img src="{{ item.product_image.url }}" class="card-img-top" alt="{{ item.slug }}" style="max-height: 300px; width: 100%">
+        <div class="card-body">
+          <h5 class="card-title">{{ item.product_name }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ item.product_price }} грн.</h6></a>
+          {% if user.is_authenticated  %}
+
+            {% if user.is_superuser %}
+              <a href="/admin/products/product/{{ item.id }}/change/" class="btn btn-warning">Edit</a>
+            {% endif %}
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+</div>
+  </div>
+
+    <script>
+    $(document).on("click","#add-to-cart",function(event){
+      event.preventDefault();
+      var selector = $(this).closest("#product-id");
+      console.log(selector);
+      const form_data = {
+        csrfmiddlewaretoken: $('#transactionIDValue input[name="csrfmiddlewaretoken"]').val()
+      };
+
+      });
+    </script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% include "cats.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+<div><img src="{{ data.product_image.url }}" alt="{{ data.slug }}"></div>
+<div>{{ data.product_name }}</div>
+<div>{{ data.product_price }} грн.</div>
+{% if user.is_authenticated  %}
+  <form action="{% url 'products:add_to_cart' data.pk %}" method="post" id="form-add-to-cart">
+    {% csrf_token %}
+    <input type="hidden" value="{{ data.pk }}" id="product-id">
+    <input type="submit" id="add-to-cart" class="btn btn-success" value="Добавить в корзину">
+
+  </form>
+  {% if user.is_superuser %}
+  <a href="/admin/products/product/{{ item.id }}/change/" class="btn btn-warning">Edit</a>
+  {% endif %}
+{% endif %}
+</div>
+
+
+<script>
+  $(document).on("click","#add-to-cart",function(){
+  event.preventDefault();
+  var product_id = $("#product-id").val();
+  var url = $("#form-add-to-cart").attr('action');
+  console.log(product_id);
+  data = {
+     'product_id': product_id,
+     'csrfmiddlewaretoken': $('#form-add-to-cart input[name="csrfmiddlewaretoken"]').val(),
+  };
+
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: data,
+      dataType: 'json',
+    });
+    alert("Product added to cart!")
+  });
+
+</script>
+{% endblock %}
