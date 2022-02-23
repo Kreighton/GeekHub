@@ -1,10 +1,19 @@
 from django import forms
 from .models import Category
 
+from django.db.utils import OperationalError
 
-category_list = [(i, i) for i in Category.objects.all()]
+
 
 class SelectCategory(forms.Form):
-    selected_cat = forms.CharField(label="", max_length=20, widget=forms.Select(choices=category_list))
+    selected_cat = forms.ChoiceField(label='')
+
+    def __init__(self, *args, **kwargs):
+        super(SelectCategory, self).__init__(*args, **kwargs)
+        self.fields['selected_cat'].choices = Category.objects.values_list('cus_cat', 'cus_cat')
+
+
+
+
 
 
