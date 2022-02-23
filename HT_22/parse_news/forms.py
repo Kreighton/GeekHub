@@ -10,7 +10,11 @@ class SelectCategory(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(SelectCategory, self).__init__(*args, **kwargs)
-        self.fields['selected_cat'].choices = Category.objects.values_list('cus_cat', 'cus_cat')
+        try:
+            self.fields['selected_cat'].choices = Category.objects.values_list('cus_cat', 'cus_cat')
+        except OperationalError:
+            self.fields['selected_cat'].choices = [('', '')]
+
 
 
 
